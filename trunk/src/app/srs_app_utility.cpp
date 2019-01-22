@@ -89,12 +89,9 @@ int srs_socket_connect(string server, int port, int64_t timeout, st_netfd_t* pst
     if(stfd == NULL){
         ret = ERROR_ST_OPEN_SOCKET;
         srs_error("st_netfd_open_socket failed. ret=%d", ret);
-<<<<<<< HEAD
         srs_close_stfd(stfd);
         freeaddrinfo(result);
-=======
         ::close(sock);
->>>>>>> b0e91e8fe91f99ccd22287c17cc95677432adaf0
         return ret;
     }
     
@@ -109,8 +106,6 @@ int srs_socket_connect(string server, int port, int64_t timeout, st_netfd_t* pst
     
     *pstfd = stfd;
     return ret;
-<<<<<<< HEAD
-=======
     
 failed:
     if (stfd) {
@@ -118,7 +113,6 @@ failed:
     }
     ::close(sock);
     return ret;
->>>>>>> b0e91e8fe91f99ccd22287c17cc95677432adaf0
 }
 
 int srs_get_log_level(string level)
