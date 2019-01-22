@@ -256,7 +256,27 @@ int SrsTcpListener::listen()
     }
     srs_verbose("setsockopt reuse-addr success. port=%d, fd=%d", port, _fd);
     
+<<<<<<< HEAD
     if (bind(_fd, result->ai_addr, result->ai_addrlen) == -1) {
+=======
+    // Detect alive for TCP connection.
+    // @see https://github.com/ossrs/srs/issues/1044
+#ifdef SO_KEEPALIVE
+    int tcp_keepalive = 1;
+    if (setsockopt(_fd, SOL_SOCKET, SO_KEEPALIVE, &tcp_keepalive, sizeof(int)) == -1) {
+        ret = ERROR_SOCKET_SETKEEPALIVE;
+        srs_error("setsockopt SO_KEEPALIVE[%d]error. port=%d, ret=%d", tcp_keepalive, port, ret);
+        return ret;
+    }
+    srs_verbose("setsockopt SO_KEEPALIVE[%d]success. port=%d", tcp_keepalive, port);
+#endif
+
+    sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = inet_addr(ip.c_str());
+    if (bind(_fd, (const sockaddr*)&addr, sizeof(sockaddr_in)) == -1) {
+>>>>>>> b0e91e8fe91f99ccd22287c17cc95677432adaf0
         ret = ERROR_SOCKET_BIND;
         srs_error("bind socket error. ep=%s:%d, ret=%d", ip.c_str(), port, ret);
         freeaddrinfo(result);
