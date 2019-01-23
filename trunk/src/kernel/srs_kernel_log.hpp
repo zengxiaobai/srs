@@ -131,7 +131,7 @@ extern ISrsLog* _srs_log;
 extern ISrsThreadContext* _srs_context;
 
 // donot print method
-#if 1
+#if 0
     #define srs_verbose(msg, ...) _srs_log->verbose(NULL, _srs_context->get_id(), msg, ##__VA_ARGS__)
     #define srs_info(msg, ...)    _srs_log->info(NULL, _srs_context->get_id(), msg, ##__VA_ARGS__)
     #define srs_trace(msg, ...)   _srs_log->trace(NULL, _srs_context->get_id(), msg, ##__VA_ARGS__)
@@ -154,6 +154,7 @@ extern ISrsThreadContext* _srs_context;
 #endif
 
 // TODO: FIXME: add more verbose and info logs.
+/*
 #ifndef SRS_AUTO_VERBOSE
     #undef srs_verbose
     #define srs_verbose(msg, ...) (void)0
@@ -166,6 +167,6 @@ extern ISrsThreadContext* _srs_context;
     #undef srs_trace
     #define srs_trace(msg, ...) (void)0
 #endif
-
+*/
 #endif
 
