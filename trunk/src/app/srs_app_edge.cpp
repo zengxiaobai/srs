@@ -363,7 +363,11 @@ int SrsEdgeIngester::connect_server(string& ep_server, string& ep_port)
         server = server.substr(0, pos);
         port = ::atoi(s_port.c_str());
     }
-    
+    srs_info("new server is %s\n", server.c_str());
+    if ((pos = server.find("0.0.0.0")) != std::string::npos) {
+        server = _req->host;
+        srs_info("new server is %s", server.c_str());
+    }    
     // output the connected server and port.
     ep_server = server;
     ep_port = s_port;

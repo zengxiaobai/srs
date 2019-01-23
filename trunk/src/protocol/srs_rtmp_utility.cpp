@@ -41,13 +41,13 @@ using namespace std;
 #include <srs_rtmp_io.hpp>
 
 void srs_discovery_tc_url(
-    string tcUrl, 
+    string& tcUrl, 
     string& schema, string& host, string& vhost, 
     string& app, string& stream, string& port, std::string& param
 ) {
     size_t pos = std::string::npos;
     std::string url = tcUrl;
-    
+    std::string tmp = "";
     if ((pos = url.find("://")) != std::string::npos) {
         schema = url.substr(0, pos);
         url = url.substr(schema.length() + 3);
@@ -56,6 +56,7 @@ void srs_discovery_tc_url(
     
     if ((pos = url.find("/")) != std::string::npos) {
         host = url.substr(0, pos);
+        tmp = host;
         url = url.substr(host.length() + 1);
         srs_info("discovery host=%s", host.c_str());
     }
@@ -64,9 +65,15 @@ void srs_discovery_tc_url(
     if ((pos = host.find(":")) != std::string::npos) {
         port = host.substr(pos + 1);
         host = host.substr(0, pos);
+        tmp = host;
         srs_info("discovery host=%s, port=%s", host.c_str(), port.c_str());
     }
-    
+    if ((pos = host.find("---")) != std::string::npos) {
+        host = host.substr(0, pos);
+        host = srs_string_replace(host, "--", ".");
+        tcUrl = srs_string_replace(tcUrl, tmp, host);
+        srs_info("discovery new host=%s, tcUrl=%s", host.c_str(), tcUrl.c_str());
+    }    
     app = url;
     vhost = host;
     srs_vhost_resolve(vhost, app, param);

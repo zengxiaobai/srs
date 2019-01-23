@@ -2524,6 +2524,7 @@ int SrsRtmpServer::connect_app(SrsRequest* req)
     srs_discovery_tc_url(req->tcUrl, 
         req->schema, req->host, req->vhost, req->app, req->stream, req->port,
         req->param);
+    srs_info("new tc_url %s", req->tcUrl.c_str());
     req->strip();
     
     return ret;

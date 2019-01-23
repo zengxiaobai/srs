@@ -5497,7 +5497,8 @@ VOID TEST(ProtocolRTMPTest, RTMPRequest)
     std::string param;
     
     req.stream = "livestream";
-    srs_discovery_tc_url("rtmp://std.ossrs.net/live", 
+    std::string tc1 = "rtmp://std.ossrs.net/live";
+    srs_discovery_tc_url(tc1, 
         req.schema, req.host, req.vhost, req.app, req.stream, req.port, param);
     req.strip();
     EXPECT_STREQ("rtmp", req.schema.c_str());
@@ -5507,7 +5508,8 @@ VOID TEST(ProtocolRTMPTest, RTMPRequest)
     EXPECT_STREQ("1935", req.port.c_str());
     
     req.stream = "livestream";
-    srs_discovery_tc_url("rtmp://s td.os srs.n et/li v e", 
+    std::string tc2 = "rtmp://s td.os srs.n et/li v e";
+    srs_discovery_tc_url(tc2,
         req.schema, req.host, req.vhost, req.app, req.stream, req.port, param);
     req.strip();
     EXPECT_STREQ("rtmp", req.schema.c_str());
@@ -5517,7 +5519,8 @@ VOID TEST(ProtocolRTMPTest, RTMPRequest)
     EXPECT_STREQ("1935", req.port.c_str());
     
     req.stream = "livestream";
-    srs_discovery_tc_url("rtmp://s\ntd.o\rssrs.ne\nt/li\nve", 
+    std::string tc3 = "rtmp://s\ntd.o\rssrs.ne\nt/li\nve";
+    srs_discovery_tc_url(tc3, 
         req.schema, req.host, req.vhost, req.app, req.stream, req.port, param);
     req.strip();
     EXPECT_STREQ("rtmp", req.schema.c_str());
@@ -5527,7 +5530,8 @@ VOID TEST(ProtocolRTMPTest, RTMPRequest)
     EXPECT_STREQ("1935", req.port.c_str());
     
     req.stream = "livestream";
-    srs_discovery_tc_url("rtmp://std.ossrs.net/live ", 
+    std::string tc4 = "rtmp://std.ossrs.net/live ";
+    srs_discovery_tc_url(tc4, 
         req.schema, req.host, req.vhost, req.app, req.stream, req.port, param);
     req.strip();
     EXPECT_STREQ("rtmp", req.schema.c_str());

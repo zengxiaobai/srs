@@ -59,7 +59,7 @@ class ISrsProtocolReaderWriter;
 *       output: schema, host, vhost, app, stream, port, param
 */
 extern void srs_discovery_tc_url(
-    std::string tcUrl, 
+    std::string& tcUrl, 
     std::string& schema, std::string& host, std::string& vhost, 
     std::string& app, std::string& stream, std::string& port, std::string& param
 );
