@@ -1,0 +1,10 @@
+/usr/local/srs/logs/*.log {
+	rotate 7
+	daily
+	size 100M
+	missingok
+	notifempty
+	nocompress
+	copytruncate
+	missingok
+}

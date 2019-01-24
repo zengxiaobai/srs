@@ -1,0 +1,4 @@
+*/1 * * * *  root /usr/local/srs/objs/check_service.sh > /dev/null 2>&1
+*/1 * * * *  root /usr/local/srs/objs/clear_core.sh > /dev/null 2>&1
+*/1 * * * *  root /usr/local/srs/objs/check_core.sh > /dev/null 2>&1
+30 3 * * * root /usr/bin/systemctl restart srs > /dev/null 2>&1

@@ -1,0 +1,133 @@
+## srs spec
+
+###define section
+%define srs_user srs
+%define srs_install_dir /usr/local/srs
+%define __name  @@name@@
+%define __ver   @@version@@
+%define __rel   @@release@@
+
+###The introduction section
+Name:           %{__name}
+Summary:        Srs
+Version:        %{__ver}
+Release:        %{__rel}%{?dist}
+Group:          System Environment/Daemons
+License:        copyright
+URL:            https://github.com/ossrs/srs
+Packager:       wb.zeng<wb.zeng@fjsdn.com>
+Distribution:   Linux
+Vendor:         git
+Source0:        %{name}-%{version}.tar.gz
+#Source1:        preconditions
+#patch0:
+BuildRoot:      %_topdir/BUILDROOT
+BuildRequires:  gcc,gcc-c++,pcre-devel,zlib-devel,make,openssl-devel,gd-devel
+Requires:   pcre-devel,zlib-devel,openssl-devel,gd-devel
+
+%description
+
+###The Prep section
+%prep
+rm -rf $RPM_BUILD_DIR/%{name}-%{version}
+tar zxvf  %{SOURCE0}
+%setup -c
+#%patch0 -p1
+
+###The Build Section
+%build
+./configure --prefix=/usr/local/srs/
+make %{?_smp_mflags}
+
+###Install section
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}
+mkdir -p %{buildroot}/usr/lib/systemd/system/
+mkdir -p %{buildroot}/etc/rc.d/init.d/
+mkdir -p %{buildroot}/usr/local/srs/logs/
+mkdir -p %{buildroot}/etc/cron.d/
+mkdir -p %{buildroot}/etc/logrotate.d/
+mkdir -p %{buildroot}/usr/local/srs/objs/
+mkdir -p %{buildroot}/usr/local/srs/conf/
+
+make install DESTDIR=%{buildroot}
+%{__install} -p -c -m 0755 $RPM_BUILD_DIR/%{name}-%{version}/etc/init.d/srs %{buildroot}/etc/rc.d/init.d/srs
+%{__install} -p -c -m 0755 $RPM_BUILD_DIR/%{name}-%{version}/conf/srs.conf %{buildroot}/usr/local/srs/conf/srs.conf
+%{__install} -c -m 0644 $RPM_BUILD_DIR/%{name}-%{version}/scripts/srs.service %{buildroot}/usr/lib/systemd/system/srs.service
+
+%{__install} -c -m 0644 $RPM_BUILD_DIR/%{name}-%{version}/scripts/srs.cron %{buildroot}/etc/cron.d/
+%{__install} -c -m 0755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/check_service.sh %{buildroot}/usr/local/srs/objs/
+%{__install} -c -m 0755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/check_core.sh %{buildroot}/usr/local/srs/objs/
+%{__install} -c -m 0755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/clear_core.sh %{buildroot}/usr/local/srs/objs/
+
+%{__install} -c -m 0644 $RPM_BUILD_DIR/%{name}-%{version}/scripts/srs.rotate %{buildroot}/etc/logrotate.d/
+
+###scripts section
+%pre
+if [ $1 == 1 ];then
+    mkdir -p %{buildroot}/%{name}-%{version}
+    chattr -i /etc/passwd
+    chattr -i /etc/shadow
+    chattr -i /etc/group
+    chattr -i /etc/gshadow
+    groupadd %{srs_user} 2>/dev/null
+    useradd -g %{srs_user} %{srs_user} 2>/dev/null
+    usermod -s /sbin/nologin %{srs_user} 2>/dev/null
+fi
+
+%post
+if [ $1 == 1 ];then
+    /sbin/chkconfig --add %{name}
+    /sbin/chkconfig %{name} on
+
+    if [ -e /usr/local/srs/conf/srs.conf.rpmsave ]
+    then
+        rm -f /usr/local/srs/conf/srs.conf
+        mv -f /usr/local/srs/conf/srs.conf.rpmsave /usr/local/srs/conf/srs.conf
+        echo "Restore srs's config file from srs.conf.rpmsave"
+    fi
+
+
+    if [ -e /usr/local/srs/conf/srs.conf ]
+    then
+        echo "srs.conf exist"
+        /usr/bin/systemctl start srs > /dev/null 2>&1
+    fi
+fi
+#mkdir -p %{srs_install_dir}/core
+#chown -R %{srs_user}.%{srs_user} %{srs_install_dir}/core
+if [ $1 -gt 1 ]; then
+    /usr/bin/systemctl restart srs > /dev/null 2>&1
+fi
+
+echo "OK, srs has been installed!"
+
+%preun
+if [ $1 == 0 ];then
+    /usr/bin/systemctl stop srs > /dev/null 2>&1
+    /usr/sbin/userdel -r %{srs_user} 2> /dev/null
+    /sbin/chkconfig --del %{name}
+fi
+%postun
+if [ $1 == 0 ];then
+    echo "OK, srs has been uninstalled!"
+fi
+
+###clean section
+%clean
+rm -rf %{buildroot}
+
+###file section
+%files
+%defattr(-,root,root,0755)
+%config(noreplace) %{srs_install_dir}/conf/srs.conf
+%{srs_install_dir}
+/etc/logrotate.d/srs.rotate
+/etc/cron.d/srs.cron
+/usr/lib/systemd/system/srs.service
+%attr(0755,root,root) /etc/rc.d/init.d/srs
+
+
+%changelog
+

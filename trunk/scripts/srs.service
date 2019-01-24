@@ -1,0 +1,16 @@
+[Unit]
+Description=Squid Web Proxy Server
+Documentation=man:squid(8)
+After=network.target nss-lookup.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/srs/etc/init.d/srs start
+ExecReload=/usr/local/srs/etc/init.d/srs reload
+ExecStop=/usr/local/srs/etc/init.d/srs stop
+KillMode=none
+RestartSec=3s
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
